@@ -22,10 +22,10 @@ public class SettingsMenu
         while (!backToMain)
         {
             AnsiConsole.Clear();
-            AnsiConsole.Write(new Rule("[yellow]PhotoSort Settings[/]").LeftAligned());
+            AnsiConsole.Write(new Rule("[yellow]PhotoSort Settings[/]"));
 
             var table = new Table().Border(TableBorder.Rounded);
-            table.AddColumn("Parameter");
+            table.AddColumn("Option");
             table.AddColumn("Value");
             table.AddRow("Source", string.IsNullOrEmpty(_settings.SourcePath) ? "[red]Not Set[/]" : _settings.SourcePath);
             table.AddRow("Destination", string.IsNullOrEmpty(_settings.DestinationPath) ? "[red]Not Set[/]" : _settings.DestinationPath);

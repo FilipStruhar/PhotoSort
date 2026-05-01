@@ -3,6 +3,7 @@ using MetadataExtractor.Formats.Exif;
 using PhotoSort.Models;
 using PhotoSort.Models.Enums;
 using Spectre.Console;
+using Directory = System.IO.Directory;
 
 namespace PhotoSort.Services;
 
@@ -26,6 +27,11 @@ public class PhotoAnalyzer
         ".dng", ".raw" 
     };
 
+    private readonly string[] _normalExtensions = 
+    { 
+        ".jpg", ".jpeg", ".png", ".heic", ".heif", ".webp", ".tif", ".tiff", ".bmp"
+    };
+
     public PhotoAnalyzer(UserSettings settings)
     {
         _settings = settings;
@@ -41,7 +47,14 @@ public class PhotoAnalyzer
 
         if (!Directory.Exists(_settings.SourcePath))
         {
-            AnsiConsole.MarkupLine("[yellow]Varování: Zdrojová cesta neexistuje nebo není přístupná.[/]");
+            AnsiConsole.MarkupLine("[yellow]Warning: Source path does not exist or is not accessible.[/]");
+            AnsiConsole.MarkupLine("[yellow]Please check the source path in the settings.[/]\n");
+            return archive;
+        }
+        if (!Directory.Exists(_settings.DestinationPath))
+        {
+            AnsiConsole.MarkupLine("[yellow]Warning: Destination path does not exist or is not accessible.[/]");
+            AnsiConsole.MarkupLine("[yellow]Please check the destination path in the settings.[/]\n");
             return archive;
         }
 
@@ -54,6 +67,12 @@ public class PhotoAnalyzer
             {
                 string extension = Path.GetExtension(filePath).ToLower();
                 bool isRaw = _rawExtensions.Contains(extension);
+                bool isNormal = _normalExtensions.Contains(extension);
+
+                if (!isRaw && !isNormal)
+                {
+                    continue;
+                }
 
                 // Filtrování: Rozhodneme, zda chceme tento soubor zpracovat
                 if (!ShouldProcess(isRaw)) continue;

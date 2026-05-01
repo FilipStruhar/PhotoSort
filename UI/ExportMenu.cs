@@ -18,7 +18,7 @@ public class ExportMenu
     public void Show()
     {
         AnsiConsole.Clear();
-        AnsiConsole.Write(new Rule("[green]Photo Export[/]").LeftAligned());
+        AnsiConsole.Write(new Rule("[green]Photo Export[/]"));
 
         PhotoArchive fullArchive = new PhotoArchive();
         
@@ -36,7 +36,7 @@ public class ExportMenu
             return;
         }
 
-        // 1. VÝBĚR MĚSÍCŮ
+        // VÝBĚR MĚSÍCŮ
         // Do menu přidáme informaci o počtu fotek v daném měsíci
         var monthChoices = fullArchive.Data.Keys.OrderBy(x => x).ToList();
         var selectedMonths = AnsiConsole.Prompt(
@@ -53,18 +53,24 @@ public class ExportMenu
         var filteredArchive = new PhotoArchive();
         int totalPhotosToCopy = 0;
 
-        // 2. VÝBĚR DNŮ
+        // VÝBĚR DNŮ
         foreach (var month in selectedMonths)
         {
             var daysInMonth = fullArchive.Data[month].Keys.OrderBy(x => x).ToList();
             
-            var selectedDays = AnsiConsole.Prompt(
-                new MultiSelectionPrompt<int>()
-                    .Title($"Which [blue]days[/] from [yellow]{month}[/] do you want to export?")
-                    .InstructionsText("[grey](Space to toggle, Enter to confirm)[/]")
-                    .UseConverter(d => $"{d}. [grey]({fullArchive.Data[month][d].Count} photos)[/]")
-                    .AddChoices(daysInMonth)
-                    .Select(daysInMonth)); // Všechny dny jsou defaultně vybrané
+            var dayPrompt = new MultiSelectionPrompt<int>()
+                .Title($"Which [blue]days[/] from [yellow]{month}[/] do you want to export?")
+                .InstructionsText("[grey](Space to toggle, Enter to confirm)[/]")
+                .UseConverter(d => $"{d}. [grey]({fullArchive.Data[month][d].Count} photos)[/]")
+                .AddChoices(daysInMonth);
+
+            // Všechny dny jsou defaultně vybrané
+            foreach (var day in daysInMonth)
+            {
+                dayPrompt.Select(day);
+            }
+
+            var selectedDays = AnsiConsole.Prompt(dayPrompt);
 
             foreach (var day in selectedDays)
             {
@@ -78,7 +84,6 @@ public class ExportMenu
             }
         }
 
-        // 3. FINÁLNÍ POTVRZENÍ
         if (totalPhotosToCopy > 0)
         {
             AnsiConsole.WriteLine();
@@ -86,7 +91,7 @@ public class ExportMenu
             summaryTable.AddColumn("Summary");
             summaryTable.AddColumn("Count");
             summaryTable.AddRow("Selected Months", selectedMonths.Count.ToString());
-            summaryTable.AddRow("Total Photos", $"[bold green]{totalPhotosToCopy}[/]");
+            summaryTable.AddRow("Total Photos", $"{totalPhotosToCopy}");
             
             AnsiConsole.Write(summaryTable);
             

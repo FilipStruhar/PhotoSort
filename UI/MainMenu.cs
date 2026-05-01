@@ -29,7 +29,8 @@ public class MainMenu
                     .LeftJustified()
                     .Color(Color.Blue));
 
-            AnsiConsole.MarkupLine("[grey]Welcome to the photo sorting tool.[/]\n");
+            AnsiConsole.MarkupLine("[blue]Welcome to PhotoSort[/]");
+            AnsiConsole.MarkupLine("[grey]Sort memories fast. Keep originals safe. Export with confidence.[/]\n");
 
             var choice = AnsiConsole.Prompt(
                 new SelectionPrompt<string>()
