@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="MetadataExtractor" Version="2.9.3" />
     <PackageReference Include="Spectre.Console" Version="0.55.2" />
   </ItemGroup>
 
