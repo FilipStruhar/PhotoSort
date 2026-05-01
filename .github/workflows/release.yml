@@ -1,0 +1,54 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build for ${{ matrix.rid }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - rid: win-x64
+            os_name: Windows
+          - rid: linux-x64
+            os_name: Linux
+          - rid: osx-x64
+            os_name: macOS-Intel
+          - rid: osx-arm64
+            os_name: macOS-AppleSilicon
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Publish target ${{ matrix.rid }}
+        run: dotnet publish PhotoSort.csproj -c Release -r ${{ matrix.rid }} --self-contained true -p:PublishSingleFile=true -p:PublishTrimmed=true -o ./publish
+
+      - name: Archive executable (Linux/macOS)
+        if: matrix.rid != 'win-x64'
+        run: |
+          cd publish
+          zip -r ../PhotoSort-${{ github.ref_name }}-${{ matrix.rid }}.zip .
+
+      - name: Archive executable (Windows)
+        if: matrix.rid == 'win-x64'
+        run: |
+          cd publish
+          zip -r ../PhotoSort-${{ github.ref_name }}-${{ matrix.rid }}.zip .
+
+      - name: Upload Release Asset
+        uses: softprops/action-gh-release@v2
+        with:
+          files: PhotoSort-${{ github.ref_name }}-${{ matrix.rid }}.zip
+          generate_release_notes: true

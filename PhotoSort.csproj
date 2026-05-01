@@ -5,6 +5,14 @@
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    
+    <!-- Professional Distribution Settings -->
+    <Version>1.0.0</Version>
+    <Authors>Filip Struhar</Authors>
+    <Description>Cross-platform console app for organizing and exporting photos by date.</Description>
+    <PublishSingleFile>true</PublishSingleFile>
+    <SelfContained>true</SelfContained>
+    <PublishTrimmed>true</PublishTrimmed>
   </PropertyGroup>
 
   <ItemGroup>
