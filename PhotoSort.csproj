@@ -6,9 +6,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     
-    <!-- Professional Distribution Settings -->
-    <Version>1.0.0</Version>
-    <Authors>Filip Struhar</Authors>
+    <Version>1.0.2</Version>
+    <Authors>Filip Struhár</Authors>
     <Description>Cross-platform console app for organizing and exporting photos by date.</Description>
     <PublishSingleFile>true</PublishSingleFile>
     <SelfContained>true</SelfContained>
