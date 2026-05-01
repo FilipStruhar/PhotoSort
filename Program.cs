@@ -4,21 +4,21 @@ using Spectre.Console;
 
 try
 {
-    // NASTAVENÍ KÓDOVÁNÍ
+    // Encoding setup
     Console.OutputEncoding = System.Text.Encoding.UTF8;
 
-    // INICIALIZACE SLUŽEB
-    // Vytvoříme instanci ConfigService, která se bude starat o XML soubor
+    // Service initialization
+    // Create ConfigService instance for XML settings
     var configService = new XmlConfigService();
 
-    // SPUŠTĚNÍ UI
-    // Předáme ConfigService hlavnímu menu a zavoláme jeho zobrazení
+    // UI startup
+    // Pass ConfigService to the main menu and show it
     var mainMenu = new MainMenu(configService);
     mainMenu.Show();
 }
 catch (Exception ex)
 {
-    // CENTRÁLNÍ FAILOVER
+    // Global failover
     AnsiConsole.WriteException(ex, ExceptionFormats.ShortenEverything | ExceptionFormats.ShowLinks);
     
     AnsiConsole.MarkupLine("\n[red]Application encountered a critical error and must be terminated.[/]");

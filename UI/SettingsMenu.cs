@@ -63,17 +63,17 @@ public class SettingsMenu
     }
 
     /// <summary>
-    /// Pomocná metoda pro získání a validaci cesty od uživatele.
+    /// Helper method to get and validate a path from the user.
     /// </summary>
     private string PromptForPath(string message, bool mustExist)
     {
-        // 1. KROK: Získáme textový vstup od uživatele.
-        // Spectre.Console se postará o validaci přímo během psaní.
+        // Step 1: Get text input from the user.
+        // Spectre.Console validates while the user types.
         string rawInput = AnsiConsole.Prompt(
             new TextPrompt<string>(message)
                 .Validate(path =>
                 {
-                    string expandedPath = ResolvePath(path); // Přeložíme cestu, aby se validovala v absolutní formě
+                    string expandedPath = ResolvePath(path); // Normalize to an absolute path before validating
                     
                     if (mustExist && !Directory.Exists(expandedPath))
                     {
@@ -82,7 +82,7 @@ public class SettingsMenu
 
                     try
                     {
-                        // Test na nesmyslné znaky v cestě
+                        // Basic check for invalid path characters
                         new DirectoryInfo(expandedPath);
                         return ValidationResult.Success();
                     }
@@ -92,25 +92,28 @@ public class SettingsMenu
                     }
                 }));
 
-        string resolvedPath = ResolvePath(rawInput); // Přeložíme cestu, aby se uložila v absolutní formě
+        string resolvedPath = ResolvePath(rawInput); // Normalize to an absolute path before saving
         return resolvedPath;
     }
 
     /// <summary>
-    /// Převede relativní cesty a unixové '~' na absolutní cestu.
+    /// Converts relative paths and unix '~' to an absolute path.
     /// </summary>
     private string ResolvePath(string path)
     {
         if (string.IsNullOrWhiteSpace(path)) return path;
 
-        // Podpora pro Unix/Mac home directory '~'
+        path = path.Trim('\'', '"'); // Remove wrapping quotes used around paths with spaces
+        path = path.Replace("\\ ", " "); // Undo shell-escaped spaces (e.g., "/Volumes/NIKON\ D3300")
+
+        // Support for Unix/Mac home directory '~'
         if (path.StartsWith("~"))
         {
             string homeDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
             path = Path.Combine(homeDir, path.TrimStart('~', '/', '\\'));
         }
 
-        // Převedení na absolutní cestu (vyřeší i relativní cesty jako "./photos")
+        // Convert to an absolute path (also resolves relative paths like "./photos")
         return Path.GetFullPath(path);
     }
 }

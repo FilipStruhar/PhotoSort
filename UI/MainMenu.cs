@@ -4,7 +4,7 @@ using Spectre.Console;
 namespace PhotoSort.UI;
 
 /// <summary>
-/// Hlavní UI rozcestník aplikace.
+/// Main UI hub for the application.
 /// </summary>
 public class MainMenu
 {
@@ -23,13 +23,13 @@ public class MainMenu
         {
             AnsiConsole.Clear();
             
-            // Vykreslení velkého nápisu PhotoSort
+            // Render the large PhotoSort title
             AnsiConsole.Write(
                 new FigletText("PhotoSort")
                     .LeftJustified()
                     .Color(Color.Blue));
 
-            AnsiConsole.MarkupLine("[blue]Welcome to PhotoSort[/]");
+            AnsiConsole.MarkupLine("[blue]Welcome to PhotoSort![/]");
             AnsiConsole.MarkupLine("[grey]Sort memories fast. Keep originals safe. Export with confidence.[/]\n");
 
             var choice = AnsiConsole.Prompt(
@@ -60,7 +60,7 @@ public class MainMenu
 
                 case "Exit":
                     exit = true;
-                    AnsiConsole.MarkupLine("\n[bold green]Thank you for using PhotoSort. Have a great day![/]");
+                    AnsiConsole.MarkupLine("\n[blue]Thank you for using PhotoSort. Have a great day![/]");
                     break;
             }
         }

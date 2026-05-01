@@ -36,8 +36,8 @@ public class ExportMenu
             return;
         }
 
-        // VÝBĚR MĚSÍCŮ
-        // Do menu přidáme informaci o počtu fotek v daném měsíci
+        // Month selection
+        // Show photo counts per month in the menu
         var monthChoices = fullArchive.Data.Keys.OrderBy(x => x).ToList();
         var selectedMonths = AnsiConsole.Prompt(
             new MultiSelectionPrompt<string>()
@@ -53,7 +53,7 @@ public class ExportMenu
         var filteredArchive = new PhotoArchive();
         int totalPhotosToCopy = 0;
 
-        // VÝBĚR DNŮ
+        // Day selection
         foreach (var month in selectedMonths)
         {
             var daysInMonth = fullArchive.Data[month].Keys.OrderBy(x => x).ToList();
@@ -64,7 +64,7 @@ public class ExportMenu
                 .UseConverter(d => $"{d}. [grey]({fullArchive.Data[month][d].Count} photos)[/]")
                 .AddChoices(daysInMonth);
 
-            // Všechny dny jsou defaultně vybrané
+            // Preselect all days
             foreach (var day in daysInMonth)
             {
                 dayPrompt.Select(day);
@@ -105,11 +105,11 @@ public class ExportMenu
     }
 
     /// <summary>
-    /// Pomocná metoda pro sečtení všech fotek ve všech dnech daného měsíce.
+    /// Helper method to count all photos across all days in a month.
     /// </summary>
     private int GetTotalPhotosInMonth(PhotoArchive archive, string monthKey)
     {
-        return archive.Data[monthKey].Values.Sum(dayList => dayList.Count); // Pro každý den v měsíci sečteme počet fotek a vrátíme celkový součet
+        return archive.Data[monthKey].Values.Sum(dayList => dayList.Count); // Sum photos for each day to get the monthly total
     }
 
     private void WaitForExit()

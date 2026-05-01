@@ -3,22 +3,22 @@ using PhotoSort.Models.Enums;
 namespace PhotoSort.Models;
 
 /// <summary>
-/// Reprezentuje uživatelské nastavení aplikace pro export a třídění.
+/// Represents user settings for export and sorting.
 /// </summary>
 public class UserSettings
 {
     /// <summary>
-    /// Zdrojová cesta, kde se nacházejí nezpracované fotografie.
+    /// Source path where unprocessed photos are located.
     /// </summary>
     public string SourcePath { get; set; } = string.Empty;
 
     /// <summary>
-    /// Cílová cesta pro organizovaný archiv.
+    /// Destination path for the organized archive.
     /// </summary>
     public string DestinationPath { get; set; } = string.Empty;
 
     /// <summary>
-    /// Režim třídění (Normální, Raw, nebo obojí).
+    /// Sorting mode (Normal, Raw, or Both).
     /// </summary>
     public SortMode Mode { get; set; } = SortMode.Normal;
 }

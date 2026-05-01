@@ -8,13 +8,13 @@ using Directory = System.IO.Directory;
 namespace PhotoSort.Services;
 
 /// <summary>
-/// Zajišťuje procházení souborů a extrakci metadat pro účely třídění.
+/// Handles scanning files and extracting metadata for sorting.
 /// </summary>
 public class PhotoAnalyzer
 {
-    private readonly UserSettings _settings; // Načtení nastavení pro použití v metodách třídy
+    private readonly UserSettings _settings; // Loaded settings used by class methods
     
-    // Definice RAW přípon, které aplikace rozpoznává
+    // RAW file extensions recognized by the app
     private readonly string[] _rawExtensions = 
     { 
         // Canon, Nikon, Sony
@@ -23,7 +23,7 @@ public class PhotoAnalyzer
         ".orf", ".rw2", ".raf", 
         // Pentax, Samsung, Minolta
         ".pef", ".ptx", ".srw", ".mrw", 
-        // Univerzální (Adobe, Leica, Mobily) a ostatní
+        // Universal (Adobe, Leica, mobile) and other
         ".dng", ".raw" 
     };
 
@@ -38,9 +38,9 @@ public class PhotoAnalyzer
     }
 
     /// <summary>
-    /// Analyzuje zdrojovou složku a vrací roztříděný archiv fotografií.
+    /// Scans the source folder and returns a sorted photo archive.
     /// </summary>
-    /// <returns>Objekt PhotoArchive naplněný daty.</returns>
+    /// <returns>PhotoArchive filled with data.</returns>
     public PhotoArchive GetAnalyzedFiles()
     {
         var archive = new PhotoArchive();
@@ -51,16 +51,9 @@ public class PhotoAnalyzer
             AnsiConsole.MarkupLine("[yellow]Please check the source path in the settings.[/]\n");
             return archive;
         }
-        if (!Directory.Exists(_settings.DestinationPath))
-        {
-            AnsiConsole.MarkupLine("[yellow]Warning: Destination path does not exist or is not accessible.[/]");
-            AnsiConsole.MarkupLine("[yellow]Please check the destination path in the settings.[/]\n");
-            return archive;
-        }
-
         try
         {
-            // Získáme všechny soubory ve zdrojové složce
+            // Get all files in the source folder
             string[] files = Directory.GetFiles(_settings.SourcePath);
 
             foreach (string filePath in files)
@@ -74,17 +67,17 @@ public class PhotoAnalyzer
                     continue;
                 }
 
-                // Filtrování: Rozhodneme, zda chceme tento soubor zpracovat
+                // Filtering: decide whether to process this file
                 if (!ShouldProcess(isRaw)) continue;
 
-                // Extrakce data: EXIF -> Fallback na datum vytvoření souboru
+                // Extract date: EXIF -> fallback to file creation time
                 DateTime? dateTaken = GetDateFromExif(filePath);
                 if (!dateTaken.HasValue)            
                 {
                     dateTaken ??= File.GetCreationTime(filePath);
                 }
 
-                // Vytvoření modelu fotky
+                // Create photo model
                 var photo = new PhotoFile(
                     filePath, // OriginalPath
                     Path.GetFileName(filePath), // FileName
@@ -92,7 +85,7 @@ public class PhotoAnalyzer
                     isRaw // IsRaw
                 );
 
-                // Zařazení do archivu
+                // Add to archive
                 archive.AddPhoto(photo);
             }
         }
@@ -105,7 +98,7 @@ public class PhotoAnalyzer
     }
 
     /// <summary>
-    /// Pomocná metoda pro určení, zda má být soubor zpracován na základě nastavení.
+    /// Helper method to decide whether a file should be processed based on settings.
     /// </summary>
     private bool ShouldProcess(bool isRaw)
     {
@@ -123,25 +116,25 @@ public class PhotoAnalyzer
     }
 
     /// <summary>
-    /// Pokusí se přečíst datum pořízení snímku z EXIF metadat pomocí MetadataExtractoru.
+    /// Attempts to read the capture date from EXIF metadata using MetadataExtractor.
     /// </summary>
     private DateTime? GetDateFromExif(string filePath)
     {
         try
         {
-            var directories = ImageMetadataReader.ReadMetadata(filePath); // Načtení metadat z fotografie
-            var subIfdDirectory = directories.OfType<ExifSubIfdDirectory>().FirstOrDefault(); // Hledáme "EXIF SubIFD", kde se obvykle nachází datum pořízení
+            var directories = ImageMetadataReader.ReadMetadata(filePath); // Read metadata from the photo
+            var subIfdDirectory = directories.OfType<ExifSubIfdDirectory>().FirstOrDefault(); // Look for "EXIF SubIFD" where capture date is usually stored
 
-            if (subIfdDirectory != null && subIfdDirectory.TryGetDateTime(ExifDirectoryBase.TagDateTimeOriginal, out var dateTime)) // Pokus o získání data pořízení z "TagDateTimeOriginal"
+            if (subIfdDirectory != null && subIfdDirectory.TryGetDateTime(ExifDirectoryBase.TagDateTimeOriginal, out var dateTime)) // Try to read "TagDateTimeOriginal"
             {
                 return dateTime;
             }
 
-            return null; // Pokud EXIF neobsahuje datum, vrátíme null a použijeme fallback
+            return null; // If EXIF has no date, return null and use fallback
         }
         catch
         {
-            return null; // Při chybě vrátíme null a použijeme fallback
+            return null; // On error return null and use fallback
         }
     }
 }

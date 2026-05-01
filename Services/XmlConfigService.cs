@@ -5,16 +5,16 @@ using Spectre.Console;
 namespace PhotoSort.Services;
 
 /// <summary>
-/// Zajišťuje načítání a ukládání uživatelského nastavení do souboru XML.
+/// Handles loading and saving user settings to an XML file.
 /// </summary>
 public class XmlConfigService
 {
-    private readonly string _fileName = "settings.xml"; // Deklarace názvu XML souboru pro uložení nastavení
+    private readonly string _fileName = "settings.xml"; // XML file name used to store settings
 
     /// <summary>
-    /// Uloží aktuální nastavení do souboru settings.xml.
+    /// Saves the current settings to settings.xml.
     /// </summary>
-    /// <param name="settings">Instance nastavení k uložení.</param>
+    /// <param name="settings">Settings instance to save.</param>
     public void SaveSettings(UserSettings settings)
     {
         try
@@ -31,14 +31,14 @@ public class XmlConfigService
     }
 
     /// <summary>
-    /// Načte nastavení ze souboru. Pokud soubor neexistuje, vrátí výchozí nastavení.
+    /// Loads settings from a file. If the file does not exist, returns default settings.
     /// </summary>
-    /// <returns>Objekt UserSettings s načtenými nebo výchozími daty.</returns>
+    /// <returns>UserSettings object with loaded or default data.</returns>
     public UserSettings LoadSettings()
     {
         if (!File.Exists(_fileName))
         {
-            // Soubor neexistuje, vrátíme objekt s defaultními hodnotami
+            // File does not exist, return a default instance
             return new UserSettings();
         }
 
@@ -49,12 +49,12 @@ public class XmlConfigService
             
             var settings = (UserSettings?)serializer.Deserialize(reader);
             
-            // Pokud se deserializace povedla, vrátíme výsledek, jinak nové nastavení
+            // If deserialization succeeded, return the result; otherwise return default settings
             return settings ?? new UserSettings();
         }
         catch (Exception ex)
         {
-            // Při jakékoliv chybě (např. poškozený soubor) raději vrátíme default
+            // On any error (e.g., corrupted file) return defaults
             AnsiConsole.MarkupLine("[red]Critical error in XmlConfigService:[/]");
             AnsiConsole.WriteException(ex, ExceptionFormats.ShortenEverything | ExceptionFormats.ShowLinks);
             return new UserSettings();

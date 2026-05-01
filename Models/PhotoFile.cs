@@ -1,24 +1,24 @@
 namespace PhotoSort.Models;
 
 /// <summary>
-/// Reprezentuje konkrétní fotografii určenou ke zpracování.
+/// Represents a photo to be processed.
 /// </summary>
 public class PhotoFile
 {
-    /// <summary> Původní plná cesta k souboru. </summary>
+    /// <summary> Original full path to the file. </summary>
     public string OriginalPath { get; set; } = string.Empty;
 
-    /// <summary> Název souboru (např. DSC_001.jpg). </summary>
+    /// <summary> File name (e.g., DSC_001.jpg). </summary>
     public string FileName { get; set; } = string.Empty;
 
-    /// <summary> Datum pořízení snímku získané z EXIFu nebo data vytvoření souboru. </summary>
-    public DateTime? DateTaken { get; set; } // Může být null, pokud není datum k dispozici - "DateTime?"
+    /// <summary> Capture date from EXIF or file creation time. </summary>
+    public DateTime? DateTaken { get; set; } // Can be null when no date is available
 
-    /// <summary> Příznak, zda se jedná o RAW formát. </summary>
+    /// <summary> Flag indicating whether the file is RAW. </summary>
     public bool IsRaw { get; set; }
 
     /// <summary>
-    /// Vytvoří novou instanci reprezentace fotografie.
+    /// Creates a new photo representation instance.
     /// </summary>
     public PhotoFile(string originalPath, string fileName, DateTime? dateTaken, bool isRaw)
     {

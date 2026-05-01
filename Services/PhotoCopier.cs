@@ -5,25 +5,25 @@ using System.Globalization;
 namespace PhotoSort.Services;
 
 /// <summary>
-/// Zajišťuje fyzické kopírování souborů do strukturovaného archivu na disku.
+/// Handles copying files into a structured archive on disk.
 /// </summary>
 public class PhotoCopier
 {
     private readonly UserSettings _settings;
 
     /// <summary>
-    /// Inicializuje novou instanci třídy PhotoCopier.
+    /// Initializes a new instance of the PhotoCopier class.
     /// </summary>
-    /// <param name="settings">Aktuální uživatelské nastavení obsahující cílovou cestu.</param>
+    /// <param name="settings">Current user settings containing the destination path.</param>
     public PhotoCopier(UserSettings settings)
     {
         _settings = settings;
     }
 
     /// <summary>
-    /// Projde analyzovaný archiv a zkopíruje soubory do cílových složek.
+    /// Walks the analyzed archive and copies files to target folders.
     /// </summary>
-    /// <param name="archive">Naplněná datová struktura s roztříděnými fotkami.</param>
+    /// <param name="archive">Filled data structure with sorted photos.</param>
     public void CopyFiles(PhotoArchive archive)
     {
         if (string.IsNullOrWhiteSpace(_settings.DestinationPath))
@@ -32,45 +32,56 @@ public class PhotoCopier
             return;
         }
 
+        try
+        {
+            Directory.CreateDirectory(_settings.DestinationPath);
+        }
+        catch (Exception ex)
+        {
+            AnsiConsole.MarkupLine("[red]Error: Destination path is not accessible or cannot be created.[/]");
+            AnsiConsole.WriteException(ex, ExceptionFormats.ShortenEverything | ExceptionFormats.ShowLinks);
+            return;
+        }
+
         AnsiConsole.Status()
             .Start("Copying files...", ctx =>
             {
                 foreach (var monthEntry in archive.Data)
                 {
-                    // monthEntry.Key je např. "2026-05"
+                    // monthEntry.Key e.g. "2026-05"
                     foreach (var dayEntry in monthEntry.Value)
                     {
-                        // Vezmeme první fotku v daném dni, abychom zjistili název měsíce
+                        // Use the first photo of the day to determine the month name
                         var samplePhoto = dayEntry.Value[0];
                         if (!samplePhoto.DateTaken.HasValue) continue;
 
                         DateTime date = samplePhoto.DateTaken.Value;
 
-                        // Sestavení názvů složek podle zadání
+                        // Build folder names
                         // [YYYY-MM_MonthName] -> 2026-05_May
                         string monthFolderName = $"{date:yyyy-MM}_{date:MMMM}";
                         // [YYYY-MM-DD] -> 2026-05-13
                         string dayFolderName = date.ToString("yyyy-MM-dd");
 
-                        // Bezpečné složení cesty
+                        // Safe path combine
                         string targetDirectory = Path.Combine(
                             _settings.DestinationPath, 
                             monthFolderName, 
                             dayFolderName
                         );
 
-                        // Pokud složka neexistuje, vytvoříme ji (i s nadřazenými složkami)
+                        // Create the folder if missing (including parents)
                         if (!Directory.Exists(targetDirectory))
                         {
                             Directory.CreateDirectory(targetDirectory);
                         }
 
-                        // Kopírování všech fotek daného dne
+                        // Copy all photos for the day
                         foreach (var photo in dayEntry.Value)
                         {
                             string destFile = Path.Combine(targetDirectory, photo.FileName);
 
-                            // Kopírujeme jen pokud soubor v cíli neexistuje (prevence přepsání)
+                            // Copy only if the destination file does not exist (avoid overwrites)
                             if (!File.Exists(destFile))
                             {
                                 File.Copy(photo.OriginalPath, destFile);
