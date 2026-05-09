@@ -103,6 +103,7 @@ public class SettingsMenu
     {
         if (string.IsNullOrWhiteSpace(path)) return path;
 
+        path = path.Trim(); // Remove leading/trailing whitespace
         path = path.Trim('\'', '"'); // Remove wrapping quotes used around paths with spaces
         path = path.Replace("\\ ", " "); // Undo shell-escaped spaces (e.g., "/Volumes/NIKON\ D3300")
 
