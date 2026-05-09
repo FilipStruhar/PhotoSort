@@ -24,20 +24,20 @@ public class PhotoArchive
     /// <param name="photo">Photo to add.</param>
     public void AddPhoto(PhotoFile photo)
     {
-        // If the photo has no date, ignore it in this version (safe fallback)
+        // If the photo has no date, ignore it
         if (!photo.DateTaken.HasValue) return;
 
         DateTime date = photo.DateTaken.Value;
         string monthKey = date.ToString("yyyy-MM");
         int dayKey = date.Day;
 
-        // Level 1: Year-Month (create bucket if missing)
+        // Level 1: Year-Month
         if (!Data.ContainsKey(monthKey))
         {
             Data[monthKey] = new Dictionary<int, List<PhotoFile>>();
         }
 
-        // Level 2: Day (create slot if missing)
+        // Level 2: Day
         if (!Data[monthKey].ContainsKey(dayKey))
         {
             Data[monthKey][dayKey] = new List<PhotoFile>();

@@ -23,7 +23,7 @@ public class MainMenu
         {
             AnsiConsole.Clear();
             
-            // Render the large PhotoSort title
+            // Render the PhotoSort title
             AnsiConsole.Write(
                 new FigletText("PhotoSort")
                     .LeftJustified()
