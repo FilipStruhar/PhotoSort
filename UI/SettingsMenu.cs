@@ -44,7 +44,7 @@ public class SettingsMenu
                     break;
 
                 case "Modify Destination Path":
-                    _settings.DestinationPath = PromptForPath("Enter destination folder:", false);
+                    _settings.DestinationPath = PromptForPath("Enter destination folder:", true);
                     break;
 
                 case "Modify Sort Mode":
