@@ -84,8 +84,16 @@ public class PhotoCopier
                             // Copy only if the destination file does not exist (avoid overwrites)
                             if (!File.Exists(destFile))
                             {
-                                File.Copy(photo.OriginalPath, destFile);
-                                AnsiConsole.MarkupLine($"[grey]Copying:[/] {photo.FileName} -> [green]{dayFolderName}[/]");
+                                try 
+                                {
+                                    File.Copy(photo.OriginalPath, destFile);
+                                    AnsiConsole.MarkupLine($"[grey]Copying:[/] {photo.FileName} -> [green]{dayFolderName}[/]");
+                                }
+                                catch (Exception ex)
+                                {
+                                    // Log the failure but don't stop the rest of the files from copying
+                                    AnsiConsole.MarkupLine($"[red]Failed to copy {photo.FileName}:[/] {ex.Message}");
+                                }
                             }
                         }
                     }
