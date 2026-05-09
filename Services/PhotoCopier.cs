@@ -21,12 +21,20 @@ public class PhotoCopier
     }
 
     /// <summary>
+    /// Checks whether the destination path is configured.
+    /// </summary>
+    public bool HasDestinationPath()
+    {
+        return !string.IsNullOrWhiteSpace(_settings.DestinationPath);
+    }
+
+    /// <summary>
     /// Walks the analyzed archive and copies files to target folders.
     /// </summary>
     /// <param name="archive">Filled data structure with sorted photos.</param>
     public void CopyFiles(PhotoArchive archive)
     {
-        if (string.IsNullOrWhiteSpace(_settings.DestinationPath))
+        if (!HasDestinationPath())
         {
             AnsiConsole.MarkupLine("[red]Error: Destination path is not set![/]");
             return;

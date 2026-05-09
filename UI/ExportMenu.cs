@@ -20,6 +20,20 @@ public class ExportMenu
         AnsiConsole.Clear();
         AnsiConsole.Write(new Rule("[green]Photo Export[/]"));
 
+        if (!_copier.HasDestinationPath())
+        {
+            AnsiConsole.MarkupLine("[yellow]Destination path is not set. Please update it in Settings.[/]");
+            WaitForExit();
+            return;
+        }
+
+        if (!_analyzer.HasSourcePath())
+        {
+            AnsiConsole.MarkupLine("[yellow]Source path is not set. Please update it in Settings.[/]");
+            WaitForExit();
+            return;
+        }
+
         PhotoArchive fullArchive = new PhotoArchive();
         
         AnsiConsole.Status()

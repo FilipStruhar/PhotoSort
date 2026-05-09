@@ -38,6 +38,14 @@ public class PhotoAnalyzer
     }
 
     /// <summary>
+    /// Checks whether the source path is configured.
+    /// </summary>
+    public bool HasSourcePath()
+    {
+        return !string.IsNullOrWhiteSpace(_settings.SourcePath);
+    }
+
+    /// <summary>
     /// Scans the source folder and returns a sorted photo archive.
     /// </summary>
     /// <returns>PhotoArchive filled with data.</returns>
@@ -45,7 +53,7 @@ public class PhotoAnalyzer
     {
         var archive = new PhotoArchive();
 
-        if (!Directory.Exists(_settings.SourcePath))
+        if (!HasSourcePath() || !Directory.Exists(_settings.SourcePath))
         {
             AnsiConsole.MarkupLine("[yellow]Warning: Source path does not exist or is not accessible.[/]");
             AnsiConsole.MarkupLine("[yellow]Please check the source path in the settings.[/]\n");
