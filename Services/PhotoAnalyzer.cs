@@ -58,35 +58,42 @@ public class PhotoAnalyzer
 
             foreach (string filePath in files)
             {
-                string extension = Path.GetExtension(filePath).ToLower();
-                bool isRaw = _rawExtensions.Contains(extension);
-                bool isNormal = _normalExtensions.Contains(extension);
-
-                if (!isRaw && !isNormal)
+                try
                 {
-                    continue;
+                    string extension = Path.GetExtension(filePath).ToLower();
+                    bool isRaw = _rawExtensions.Contains(extension);
+                    bool isNormal = _normalExtensions.Contains(extension);
+
+                    if (!isRaw && !isNormal)
+                    {
+                        continue;
+                    }
+
+                    // Filtering: decide whether to process this file
+                    if (!ShouldProcess(isRaw)) continue;
+
+                    // Extract date: EXIF -> fallback to file creation time
+                    DateTime? dateTaken = GetDateFromExif(filePath);
+                    if (!dateTaken.HasValue)            
+                    {
+                        dateTaken ??= File.GetCreationTime(filePath);
+                    }
+
+                    // Create photo model
+                    var photo = new PhotoFile(
+                        filePath, // OriginalPath
+                        Path.GetFileName(filePath), // FileName
+                        dateTaken, // DateTaken
+                        isRaw // IsRaw
+                    );
+
+                    // Add to archive
+                    archive.AddPhoto(photo);
                 }
-
-                // Filtering: decide whether to process this file
-                if (!ShouldProcess(isRaw)) continue;
-
-                // Extract date: EXIF -> fallback to file creation time
-                DateTime? dateTaken = GetDateFromExif(filePath);
-                if (!dateTaken.HasValue)            
+                catch (Exception ex)
                 {
-                    dateTaken ??= File.GetCreationTime(filePath);
+                    AnsiConsole.MarkupLine($"[red]Failed to process {Path.GetFileName(filePath)}:[/] {ex.Message}");
                 }
-
-                // Create photo model
-                var photo = new PhotoFile(
-                    filePath, // OriginalPath
-                    Path.GetFileName(filePath), // FileName
-                    dateTaken, // DateTaken
-                    isRaw // IsRaw
-                );
-
-                // Add to archive
-                archive.AddPhoto(photo);
             }
         }
         catch (Exception ex)

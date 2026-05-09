@@ -110,10 +110,33 @@ public class SettingsMenu
         if (path.StartsWith("~"))
         {
             string homeDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-            path = Path.Combine(homeDir, path.TrimStart('~', '/', '\\'));
+            if (string.IsNullOrWhiteSpace(homeDir))
+            {
+                // Fallback to environment variable if .NET method fails
+                homeDir = Environment.GetEnvironmentVariable("HOME");
+            }
+
+            if (string.IsNullOrWhiteSpace(homeDir))
+            {
+                // Faallback to USERPROFILE for Windows if HOME is not set
+                homeDir = Environment.GetEnvironmentVariable("USERPROFILE");
+            }
+
+            if (!string.IsNullOrWhiteSpace(homeDir))
+            {
+                // Replace the '~' with the actual home directory path
+                path = Path.Combine(homeDir, path.TrimStart('~', '/', '\\'));
+            }
         }
 
-        // Convert to an absolute path (also resolves relative paths like "./photos")
-        return Path.GetFullPath(path);
+        // Convert to an absolute path
+        try
+        {
+            return Path.GetFullPath(path);
+        }
+        catch
+        {
+            return path;
+        }
     }
 }

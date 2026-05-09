@@ -73,7 +73,15 @@ public class PhotoCopier
                         // Create the folder if missing (including parents)
                         if (!Directory.Exists(targetDirectory))
                         {
-                            Directory.CreateDirectory(targetDirectory);
+                            try
+                            {
+                                Directory.CreateDirectory(targetDirectory);
+                            }
+                            catch (Exception ex)
+                            {
+                                AnsiConsole.MarkupLine($"[red]Failed to create folder {targetDirectory}:[/] {ex.Message}");
+                                continue;
+                            }
                         }
 
                         // Copy all photos for the day
