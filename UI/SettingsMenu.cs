@@ -110,7 +110,7 @@ public class SettingsMenu
         // Support for Unix/Mac home directory '~'
         if (path.StartsWith("~"))
         {
-            string homeDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+            string? homeDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
             if (string.IsNullOrWhiteSpace(homeDir))
             {
                 // Fallback to environment variable if .NET method fails
@@ -119,7 +119,7 @@ public class SettingsMenu
 
             if (string.IsNullOrWhiteSpace(homeDir))
             {
-                // Faallback to USERPROFILE for Windows if HOME is not set
+                // Fallback to USERPROFILE for Windows if HOME is not set
                 homeDir = Environment.GetEnvironmentVariable("USERPROFILE");
             }
 

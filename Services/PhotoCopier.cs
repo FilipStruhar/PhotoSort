@@ -51,6 +51,11 @@ public class PhotoCopier
             return;
         }
 
+        int totalToCopy = 0;
+        int copied = 0;
+        int failed = 0;
+        int skipped = 0;
+
         AnsiConsole.Status()
             .Start("Copying files...", ctx =>
             {
@@ -88,6 +93,7 @@ public class PhotoCopier
                             catch (Exception ex)
                             {
                                 AnsiConsole.MarkupLine($"[red]Failed to create folder {targetDirectory}:[/] {ex.Message}");
+                                failed += dayEntry.Value.Count;
                                 continue;
                             }
                         }
@@ -98,24 +104,37 @@ public class PhotoCopier
                             string destFile = Path.Combine(targetDirectory, photo.FileName);
 
                             // Copy only if the destination file does not exist (avoid overwrites)
-                            if (!File.Exists(destFile))
+                            if (File.Exists(destFile))
                             {
-                                try 
-                                {
-                                    File.Copy(photo.OriginalPath, destFile);
-                                    AnsiConsole.MarkupLine($"[grey]Copying:[/] {photo.FileName} -> [green]{dayFolderName}[/]");
-                                }
-                                catch (Exception ex)
-                                {
-                                    // Log the failure but don't stop the rest of the files from copying
-                                    AnsiConsole.MarkupLine($"[red]Failed to copy {photo.FileName}:[/] {ex.Message}");
-                                }
+                                skipped++;
+                                continue;
+                            }
+
+                            totalToCopy++;
+
+                            try 
+                            {
+                                File.Copy(photo.OriginalPath, destFile);
+                                copied++;
+                                AnsiConsole.MarkupLine($"[grey]Copying:[/] {photo.FileName} -> [green]{dayFolderName}[/]");
+                            }
+                            catch (Exception ex)
+                            {
+                                failed++;
+                                // Log the failure but don't stop the rest of the files from copying
+                                AnsiConsole.MarkupLine($"[red]Failed to copy {photo.FileName}:[/] {ex.Message}");
                             }
                         }
                     }
                 }
             });
 
-        AnsiConsole.MarkupLine("[bold green]All files were successfully copied![/]");
+        if (totalToCopy > 0 && failed == 0 && copied == totalToCopy)
+        {
+            AnsiConsole.MarkupLine("[bold green]All files were successfully copied![/]");
+            return;
+        }
+
+        AnsiConsole.MarkupLine($"[yellow]Copy finished: {copied} copied, {failed} failed, {skipped} skipped.[/]");
     }
 }
